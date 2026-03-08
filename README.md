@@ -6,7 +6,7 @@ Minimal Express + TypeScript API (using `pnpm`) for browser rendering.
 
 - `POST /content` - Returns HTML as `value`
 - `POST /screenshot` - Returns PNG image binary (`image/png`)
-- `POST /snapshot` - Returns JSON with `url`, `html`, and `screenshotBase64`
+- `POST /snapshot` - Returns JSON with `url`, `html`, and `screenshot`
 
 All endpoints require HTTP Basic Auth.
 
@@ -34,6 +34,7 @@ Both endpoints receive JSON body:
 ```
 
 All request options except `url` are optional. Timeout limits:
+
 - `gotoOptions.timeout`: max `60000` (default `30000`)
 - `waitForSelector.timeout`: max `120000`
 - `waitForTimeout`: max `120000`

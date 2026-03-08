@@ -4,7 +4,7 @@ import { RequestOptions } from './utils.js';
 type SnapshotResult = {
   url: string;
   html: string;
-  screenshotBase64: string;
+  screenshot: string;
 };
 
 export class BrowserService {
@@ -43,7 +43,7 @@ export class BrowserService {
   }
 
   async getScreenshot(requestOptions: RequestOptions): Promise<Buffer> {
-     const { url, userAgent, viewport, locale, gotoOptions, waitForSelector, waitForTimeout } = requestOptions;
+    const { url, userAgent, viewport, locale, gotoOptions, waitForSelector, waitForTimeout } = requestOptions;
     const context = await this.browser.newContext({ userAgent, viewport, locale });
 
     const page = await context.newPage();
@@ -60,7 +60,6 @@ export class BrowserService {
       if (typeof waitForTimeout === 'number') {
         await page.waitForTimeout(waitForTimeout);
       }
-
 
       const screenshot = await page.screenshot({ type: 'png', fullPage: true });
       return screenshot;
@@ -94,7 +93,7 @@ export class BrowserService {
       return {
         url: page.url(),
         html,
-        screenshotBase64: screenshot.toString('base64')
+        screenshot: screenshot.toString('base64')
       };
     } finally {
       await context.close();
