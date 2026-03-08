@@ -100,6 +100,29 @@ pnpm build
 pnpm start
 ```
 
+## Docker
+
+Build image:
+
+```bash
+docker build -t webcapture .
+```
+
+Run container with environment from `.env.example`:
+
+```bash
+cp .env.example .env
+docker run --rm -p 3000:3000 --env-file .env webcapture
+```
+
+Call the API:
+
+```bash
+curl -u admin:change-me -X POST http://localhost:3000/content \
+  -H "content-type: application/json" \
+  -d '{"url":"https://example.com"}'
+```
+
 ## Errors
 
 Validation and runtime errors are returned as JSON:
