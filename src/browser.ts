@@ -21,7 +21,7 @@ export class BrowserService {
 
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-      await page.mouse.wheel(0, 2000);
+
       await page.waitForTimeout(2000);
 
       const html = await page.content();
@@ -37,7 +37,7 @@ export class BrowserService {
 
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-      await page.mouse.wheel(0, 2000);
+
       await page.waitForTimeout(2000);
 
       const screenshot = await page.screenshot({ type: 'png', fullPage: true });

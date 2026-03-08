@@ -40,20 +40,22 @@ export function createApp(browserService: BrowserService): express.Express {
   );
 
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const credentials = parseBasicAuthHeader(req.headers.authorization);
-    if (!credentials) {
-      next(new HttpError(401, 'Unauthorized'));
-      return;
-    }
+    try {
+      const credentials = parseBasicAuthHeader(req.headers.authorization);
+      if (!credentials) {
+        throw new HttpError(401, 'Unauthorized');
+      }
 
-    const userMatches = safeEqual(credentials.username, authUser);
-    const passwordMatches = safeEqual(credentials.password, authPassword);
-    if (!userMatches || !passwordMatches) {
-      next(new HttpError(401, 'Unauthorized'));
-      return;
-    }
+      const userMatches = safeEqual(credentials.username, authUser);
+      const passwordMatches = safeEqual(credentials.password, authPassword);
+      if (!userMatches || !passwordMatches) {
+        throw new HttpError(401, 'Unauthorized');
+      }
 
-    next();
+      next();
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.post('/content', async (req: Request, res: Response, next: NextFunction) => {
