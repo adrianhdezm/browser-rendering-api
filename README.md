@@ -13,9 +13,29 @@ Both endpoints receive JSON body:
 
 ```json
 {
-  "url": "https://example.com"
+  "url": "https://example.com",
+  "gotoOptions": {
+    "timeout": 30000,
+    "waitUntil": "domcontentloaded"
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+  "viewport": {
+    "height": 1080,
+    "width": 1920
+  },
+  "waitForSelector": {
+    "selector": "main",
+    "visible": true,
+    "timeout": 30000
+  },
+  "waitForTimeout": 1000
 }
 ```
+
+All request options except `url` are optional. Timeout limits:
+- `gotoOptions.timeout`: max `60000` (default `30000`)
+- `waitForSelector.timeout`: max `120000`
+- `waitForTimeout`: max `120000`
 
 ## Setup
 

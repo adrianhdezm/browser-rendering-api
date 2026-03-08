@@ -1,10 +1,5 @@
 import { Browser, chromium } from 'playwright';
-
-const browserContextOptions = {
-  viewport: { width: 1024, height: 1280 },
-  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-  locale: 'en-US'
-};
+import { RequestOptions } from './utils.js';
 
 export class BrowserService {
   private browser!: Browser;
@@ -15,14 +10,24 @@ export class BrowserService {
     this.browser = await chromium.launch({ headless: true });
   }
 
-  async getContent(url: string): Promise<{ url: string; value: string }> {
-    const context = await this.browser.newContext(browserContextOptions);
+  async getContent(requestOptions: RequestOptions): Promise<{ url: string; value: string }> {
+    const { url, userAgent, viewport, locale, gotoOptions, waitForSelector, waitForTimeout } = requestOptions;
+    const context = await this.browser.newContext({ userAgent, viewport, locale });
+
     const page = await context.newPage();
 
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page.goto(url, gotoOptions);
 
-      await page.waitForTimeout(2000);
+      if (waitForSelector) {
+        await page.waitForSelector(waitForSelector.selector, {
+          state: waitForSelector.hidden ? 'hidden' : 'visible',
+          timeout: waitForSelector.timeout
+        });
+      }
+      if (typeof waitForTimeout === 'number') {
+        await page.waitForTimeout(waitForTimeout);
+      }
 
       const html = await page.content();
       return { url: page.url(), value: html };
@@ -31,14 +36,25 @@ export class BrowserService {
     }
   }
 
-  async getScreenshot(url: string): Promise<Buffer> {
-    const context = await this.browser.newContext(browserContextOptions);
+  async getScreenshot(requestOptions: RequestOptions): Promise<Buffer> {
+     const { url, userAgent, viewport, locale, gotoOptions, waitForSelector, waitForTimeout } = requestOptions;
+    const context = await this.browser.newContext({ userAgent, viewport, locale });
+
     const page = await context.newPage();
 
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page.goto(url, gotoOptions);
 
-      await page.waitForTimeout(2000);
+      if (waitForSelector) {
+        await page.waitForSelector(waitForSelector.selector, {
+          state: waitForSelector.hidden ? 'hidden' : 'visible',
+          timeout: waitForSelector.timeout
+        });
+      }
+      if (typeof waitForTimeout === 'number') {
+        await page.waitForTimeout(waitForTimeout);
+      }
+
 
       const screenshot = await page.screenshot({ type: 'png', fullPage: true });
       return screenshot;

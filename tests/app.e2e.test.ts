@@ -61,6 +61,46 @@ describe('app e2e', { timeout: 60_000 }, () => {
     expect(response.body).toEqual({ error: expect.any(String) });
   });
 
+  it('accepts request options in payload', async () => {
+    const app = createApp(browserService as BrowserService);
+    const response = await request(app)
+      .post('/content')
+      .auth(authUser, authPassword)
+      .send({
+        url: 'https://example.com',
+        gotoOptions: {
+          timeout: 10_000,
+          waitUntil: 'domcontentloaded'
+        },
+        waitForSelector: {
+          selector: 'h1',
+          visible: true,
+          timeout: 10_000
+        },
+        waitForTimeout: 100
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.url).toContain('https://example.com');
+    expect(response.body.value).toContain('Example Domain');
+  });
+
+  it('returns 400 when gotoOptions timeout exceeds max', async () => {
+    const app = createApp(browserService as BrowserService);
+    const response = await request(app)
+      .post('/content')
+      .auth(authUser, authPassword)
+      .send({
+        url: 'https://example.com',
+        gotoOptions: {
+          timeout: 60_001
+        }
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ error: expect.any(String) });
+  });
+
   it('returns 404 for unknown route', async () => {
     const app = createApp(browserService as BrowserService);
     const response = await request(app).get('/not-found').auth(authUser, authPassword);

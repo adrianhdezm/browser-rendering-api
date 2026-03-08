@@ -5,7 +5,7 @@ import { pinoHttp } from 'pino-http';
 import { z, ZodError } from 'zod';
 import { BrowserService } from './browser.js';
 import { logger } from './logger.js';
-import { parseBasicAuthHeader, safeEqual } from './utils.js';
+import { parseBasicAuthHeader, requestOptionsSchema, safeEqual } from './utils.js';
 
 class HttpError extends Error {
   public readonly statusCode: number;
@@ -17,7 +17,6 @@ class HttpError extends Error {
   }
 }
 
-const urlRequestSchema = z.object({ url: z.httpUrl().normalize() });
 
 export function createApp(browserService: BrowserService): express.Express {
   const authUser = process.env.BASIC_AUTH_USER;
@@ -60,9 +59,10 @@ export function createApp(browserService: BrowserService): express.Express {
 
   app.post('/content', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payload = urlRequestSchema.parse(req.body);
+      const requestOptions = requestOptionsSchema.parse(req.body);
       const browser = req.app.locals.browser;
-      const result = await browser.getContent(payload.url);
+     
+      const result = await browser.getContent(requestOptions);
 
       res.json(result);
     } catch (error) {
@@ -72,9 +72,10 @@ export function createApp(browserService: BrowserService): express.Express {
 
   app.post('/screenshot', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payload = urlRequestSchema.parse(req.body);
+      const requestOptions = requestOptionsSchema.parse(req.body);
       const browser = req.app.locals.browser;
-      const screenshot = await browser.getScreenshot(payload.url);
+     
+      const screenshot = await browser.getScreenshot(requestOptions);
 
       res.type('image/png').send(screenshot);
     } catch (error) {
